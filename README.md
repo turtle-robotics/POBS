@@ -44,7 +44,7 @@ primary objectives:
 
 ## Project Poster
 
-![POBS-Fall-2024-Poster](resources/Fall-'24-Showcase/POBS.png)
+![POBS-Fall-2024-Poster](resources/Fall-24-Showcase/POBS.png)
 
 
 ## Team Members
