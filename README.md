@@ -57,30 +57,35 @@ primary objectives:
   - Year: X
 
 ### Chassis Subteam
+This team is resposable for designing the different components of the submersable
 - **[Name](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: X
   - Year: X
     
 ### Electrical and Navigation Subteam
+This team is responsable for the programming and electrical component of the submersable.
 - **[Name](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: X
   - Year: X
 
 ### Waterproofing Subteam
+This team is responsable for water testing the submersable, collecting data, and providing waterproofing recommendations to the Chassis team.
  - **[Name](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: X
   - Year: X
 
 ### Mini Turtle Subteam
+This team is responsable for our Turtle shaped outreach project.
  - **[Name](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: X
   - Year: X
 
 ### Alumni
+Former Members of our team!
 - **[Name](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: X
