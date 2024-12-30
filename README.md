@@ -51,13 +51,36 @@ primary objectives:
 
 
 ### Project Leadership
-- **[Name](https://www.linkedin.com/in/name)**
+- **[Malcolm Ferguson](https://www.linkedin.com/in/MalcolmFerg)**
+  - Major: Mechatronics (MXET)
+  - Role: Project Lead
+  - Year: 2026
+
+  - **[Name](https://www.linkedin.com/in/name)**
   - Major: X
-  - Role: X
+  - Role: Chassis Subteam Lead
   - Year: X
+
+  - **[Aidan Briggs](https://www.linkedin.com/in/name)**
+  - Major: X
+  - Role: Electrical and Navigation Subteam Lead
+  - Year: X
+
+  - **[Name](https://www.linkedin.com/in/name)**
+  - Major: X
+  - Role: Waterproofing Subteam Lead
+  - Year: X
+
+  - **[Name](https://www.linkedin.com/in/name)**
+  - Major: X
+  - Role: Mini Turtle Subteam Lead
+  - Year: X
+
+
 
 ### Chassis Subteam
 This team is resposable for designing the different components of the submersable
+
 - **[Name](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: X
@@ -65,6 +88,7 @@ This team is resposable for designing the different components of the submersabl
     
 ### Electrical and Navigation Subteam
 This team is responsable for the programming and electrical component of the submersable.
+
 - **[Name](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: X
@@ -72,6 +96,7 @@ This team is responsable for the programming and electrical component of the sub
 
 ### Waterproofing Subteam
 This team is responsable for water testing the submersable, collecting data, and providing waterproofing recommendations to the Chassis team.
+
  - **[Name](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: X
@@ -79,6 +104,7 @@ This team is responsable for water testing the submersable, collecting data, and
 
 ### Mini Turtle Subteam
 This team is responsable for our Turtle shaped outreach project.
+
  - **[Name](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: X
@@ -86,11 +112,16 @@ This team is responsable for our Turtle shaped outreach project.
 
 ### Alumni
 Former Members of our team!
-- **[Name](https://www.linkedin.com/in/name)**
-  - Major: X
-  - Role: X
-  - Year: X
 
+- **[Calynn Lock](https://www.linkedin.com/in/name)**
+  - Major: IDEN
+  - Role: Chassis Developer
+  - Year: 2022
+
+- **[Andrea Shepperd](https://www.linkedin.com/in/name)**
+  - Major: MEEN
+  - Role: Chassis Developer
+  - Year: 2024
 
 ## Getting Started
 
