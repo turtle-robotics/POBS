@@ -51,7 +51,7 @@ primary objectives:
 
 
 ### Project Leadership
-- **[Malcolm Ferguson](https://www.linkedin.com/in/MalcolmFerg)**
+- **[Malcolm Ferguson](https://www.linkedin.com/in/malcolmferg/)**
   - Major: Mechatronics (MXET)
   - Role: Project Lead
   - Year: 2026
