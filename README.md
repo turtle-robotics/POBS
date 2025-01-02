@@ -56,22 +56,22 @@ primary objectives:
   - Role: Project Lead
   - Year: 2026
 
-  - **[Name](https://www.linkedin.com/in/name)**
+- **[Kayson Hergert](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: Chassis Subteam Lead
   - Year: X
 
-  - **[Aidan Briggs](https://www.linkedin.com/in/name)**
+- **[Aidan Briggs](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: Electrical and Navigation Subteam Lead
   - Year: X
 
-  - **[Name](https://www.linkedin.com/in/name)**
+- **[Elizabeth Hannsz](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: Waterproofing Subteam Lead
   - Year: X
 
-  - **[Name](https://www.linkedin.com/in/name)**
+- **[Name](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: Mini Turtle Subteam Lead
   - Year: X
@@ -81,7 +81,22 @@ primary objectives:
 ### Chassis Subteam
 This team is resposable for designing the different components of the submersable
 
-- **[Name](https://www.linkedin.com/in/name)**
+- **[Maygha Chatram](https://www.linkedin.com/in/name)**
+  - Major: X
+  - Role: X
+  - Year: X
+
+- **[Caleb Harrell](https://www.linkedin.com/in/name)**
+  - Major: X
+  - Role: X
+  - Year: X
+
+- **[Kayson Hergert](https://www.linkedin.com/in/name)**
+  - Major: X
+  - Role: X
+  - Year: X
+
+- **[Bilisa Hiticha](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: X
   - Year: X
@@ -89,7 +104,22 @@ This team is resposable for designing the different components of the submersabl
 ### Electrical and Navigation Subteam
 This team is responsable for the programming and electrical component of the submersable.
 
-- **[Name](https://www.linkedin.com/in/name)**
+- **[Alejandro Avila](https://www.linkedin.com/in/name)**
+  - Major: X
+  - Role: X
+  - Year: X
+
+- **[Aidan Briggs](https://www.linkedin.com/in/name)**
+  - Major: X
+  - Role: X
+  - Year: X
+
+- **[Jenson Jibrail](https://www.linkedin.com/in/name)**
+  - Major: X
+  - Role: X
+  - Year: X
+
+- **[Trinity Powell](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: X
   - Year: X
@@ -97,7 +127,7 @@ This team is responsable for the programming and electrical component of the sub
 ### Waterproofing Subteam
 This team is responsable for water testing the submersable, collecting data, and providing waterproofing recommendations to the Chassis team.
 
- - **[Name](https://www.linkedin.com/in/name)**
+ - **[Elizabeth Hannsz](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: X
   - Year: X
