@@ -127,7 +127,7 @@ This team is responsable for the programming and electrical component of the sub
 ### Waterproofing Subteam
 This team is responsable for water testing the submersable, collecting data, and providing waterproofing recommendations to the Chassis team.
 
- - **[Elizabeth Hannsz](https://www.linkedin.com/in/name)**
+ - **[Name](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: X
   - Year: X
