@@ -143,6 +143,16 @@ This team is responsable for our Turtle shaped outreach project.
 ### Alumni
 Former Members of our team!
 
+- **[Maguya](https://www.linkedin.com/in/name)**
+  - Major: MEEN
+  - Role: Chassis Developer
+  - Year: 2024
+
+- **[Elizabeth](https://www.linkedin.com/in/name)**
+  - Major: MEEN
+  - Role: Chassis Developer
+  - Year: 2024
+
 - **[Calynn Lock](https://www.linkedin.com/in/name)**
   - Major: IDEN
   - Role: Chassis Developer
