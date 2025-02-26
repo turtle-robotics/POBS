@@ -81,7 +81,7 @@ primary objectives:
 ### Chassis Subteam
 This team is resposable for designing the different components of the submersable
 
-- **[Maygha Chatram](https://www.linkedin.com/in/name)**
+- **[Name](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: X
   - Year: X
