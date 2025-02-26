@@ -1,6 +1,6 @@
 # POBS: Positive Operative Bouyancy Submersable
 
-Description
+
 
 ## Table of Contents
 
@@ -33,13 +33,19 @@ Description
 -->
 
 ## Project Overview
+<!-- Full name and Code; what it is acomplishing and how it is doing so. What we aim for this to prove -->
+The Positive Operative Bouyancy Submersable (POBS) aims to develop a boyant positive
 
-Full name and Code; what it is acomplishing and how it is doing so. What we aim for this to prove
 
 primary objectives:
-- primary objective #1
-- primary objective #2
-- primary objective #3
+- For the Chassis team:
+  - Develop the body of the the submersable.
+- For the Waterproofing team:
+  - Waterproof and test the submarine.
+  - Develop simulations of the different components of the submersable that the Chassis team makes.
+- For the Electrical and Navigation team:
+  - connect the different electrical components 
+- For the Mini-Turtle team:
 
 
 ## Project Poster
