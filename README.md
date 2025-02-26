@@ -56,7 +56,7 @@ primary objectives:
   - Role: Project Lead
   - Year: 2026
 
-- **[Kayson Hergert](https://www.linkedin.com/in/name)**
+- **[Name](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: Chassis Subteam Lead
   - Year: X
@@ -66,7 +66,7 @@ primary objectives:
   - Role: Electrical and Navigation Subteam Lead
   - Year: X
 
-- **[Elizabeth Hannsz](https://www.linkedin.com/in/name)**
+- **[Name](https://www.linkedin.com/in/name)**
   - Major: X
   - Role: Waterproofing Subteam Lead
   - Year: X
