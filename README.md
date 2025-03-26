@@ -115,9 +115,9 @@ This team is responsable for the programming and electrical component of the sub
   - Role: X
   - Year: X
 
-- **[Aidan Briggs](https://www.linkedin.com/in/name)**
+- **[Aidan Briggs](https://www.linkedin.com/in/Aidanbriggs)**
   - Major: Computer Science
-  - Role: Eletrical Team Lead
+  - Role: Electrical Team Lead
   - Year: 2026
 
 - **[Jenson Jibrail](https://www.linkedin.com/in/name)**
