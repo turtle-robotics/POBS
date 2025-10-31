@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Thruster Dashboard</title>
+<style>
+  body { background: #111; color: #eee; text-align: center; font-family: sans-serif; }
+  canvas { background: #222; border: 1px solid #555; margin-top: 20px; }
+</style>
+</head>
+<body>
+<h1>Robot Thruster Status</h1>
+<canvas id="thrusters" width="400" height="400"></canvas>
+
+<script>
+const ws = new WebSocket("ws://localhost:9002");
+const canvas = document.getElementById("thrusters");
+const ctx = canvas.getContext("2d");
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  drawThrusters(data.thrusters);
+};
+
+function drawThrusters(thrusters) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const cx = canvas.width / 2, cy = canvas.height / 2;
+  const radius = 120;
+
+  thrusters.forEach((t, i) => {
+    const angle = (i * Math.PI / 2);
+    const tx = cx + radius * Math.cos(angle);
+    const ty = cy + radius * Math.sin(angle);
+
+    // Draw thruster base
+    ctx.beginPath();
+    ctx.arc(tx, ty, 20, 0, 2 * Math.PI);
+    ctx.fillStyle = "#444";
+    ctx.fill();
+
+    // Draw thrust direction arrow
+    const dir = t.angle * Math.PI / 180;
+    const thrustLength = 40 * t.thrust;
+    ctx.beginPath();
+    ctx.moveTo(tx, ty);
+    ctx.lineTo(tx + thrustLength * Math.cos(dir),
+               ty + thrustLength * Math.sin(dir));
+    ctx.strokeStyle = `hsl(${120 * t.thrust}, 100%, 60%)`;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  });
+}
+</script>
+</body>
+</html>

@@ -1,8 +1,9 @@
 #ifndef IMU_H
 #define IMU_H
-
 #include <unistd.h>
+typedef uint8_t byte;
 
+namespace IMU {
 template <typename T>
 struct vec3{
     T a;
@@ -16,9 +17,9 @@ int i2c_fd;
 const char *i2c_device = "/dev/i2c-1";
 int slave_address = 0x50;
 
-
+uint8_t* read();
 void* initialize(void* args);
-
+}
 
 #endif
 

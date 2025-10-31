@@ -1,9 +1,9 @@
 #include <iostream>
-#include "../src/IMU.cpp"
+#include "../src/IMU.h"
 
 int main(){
-    initialize((void*));
+    IMU::initialize((void*)1);
 
-    std::cout<<read()[0]<<std::endl;
+    std::cout<<IMU::read()[0]<<std::endl;
 
 }

@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <IMU.h>
 
-uint8_t* read(){
+uint8_t* IMU::read(){
     uint8_t* buffer=new uint8_t[32]; // Adjust buffer size as needed
     int bytes_read;
 
@@ -14,7 +14,6 @@ uint8_t* read(){
     if (bytes_read < 0) {
         perror("Failed to read from I2C device");
         close(i2c_fd);
-        return;
     } else if (bytes_read == 0) {
        printf("No data available\n");
     }
@@ -25,21 +24,18 @@ uint8_t* read(){
         }
         printf("\n");
     }
-    return &buffer;
+    return buffer;
 }
 
-void* initialize(void* args){
+void* IMU::initialize(void* args){
 
     i2c_fd = open(i2c_device, O_RDWR);
     if (i2c_fd < 0) {
         perror("Failed to open I2C device");
-        return;
     }
 
     if (ioctl(i2c_fd, I2C_SLAVE, slave_address) < 0) {
         perror("Failed to set I2C slave address");
         close(i2c_fd);
-        return;
     }
-   
 }
