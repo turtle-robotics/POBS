@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Robot Dashboard</title>
+<style>
+  body { font-family: sans-serif; margin: 20px; display: flex; }
+  #canvasContainer { position: relative; }
+  canvas { border: 1px solid #aaa; background: #f8f8f8; }
+  #imuContainer { margin-left: 20px; display: flex; flex-direction: column; align-items: center; }
+  #imuCanvas { border: 1px solid #aaa; background: #fff; margin-bottom: 20px; }
+  .imuLabel { margin-top: 5px; }
+  #bars { margin-left: 20px; display: flex; flex-direction: row; align-items: flex-end; height: 200px; }
+  .bar-container { display: flex; flex-direction: column; align-items: center; margin-right: 10px; }
+  .bar { width: 30px; height: 150px; background: #ddd; position: relative; }
+  .fill { width: 100%; position: absolute; bottom: 0; background: blue; }
+  .label { margin-top: 5px; text-align: center; }
+</style>
+</head>
+<body>
+
+<div id="canvasContainer">
+  <canvas id="robotCanvas" width="500" height="500"></canvas>
+</div>
+
+<div id="imuContainer">
+  <canvas id="imuCanvas" width="200" height="200"></canvas>
+  <div class="imuLabel" id="imuText"></div>
+</div>
+
+<div id="bars">
+  <div class="bar-container">
+    <div class="bar"><div class="fill" id="bar0"></div></div>
+    <div class="label">T0</div>
+  </div>
+  <div class="bar-container">
+    <div class="bar"><div class="fill" id="bar1"></div></div>
+    <div class="label">T1</div>
+  </div>
+  <div class="bar-container">
+    <div class="bar"><div class="fill" id="bar2"></div></div>
+    <div class="label">T2</div>
+  </div>
+  <div class="bar-container">
+    <div class="bar"><div class="fill" id="bar3"></div></div>
+    <div class="label">T3</div>
+  </div>
+</div>
+
+<script>
+const robotCanvas = document.getElementById('robotCanvas');
+const ctx = robotCanvas.getContext('2d');
+const imuCanvas = document.getElementById('imuCanvas');
+const imuCtx = imuCanvas.getContext('2d');
+
+const robotSize = 80; // size of robot body
+
+function drawPill(x, y, width, height, color) {
+    const radius = height / 2;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    // Left semicircle
+    ctx.arc(x + radius, y + radius, radius, Math.PI / 2, Math.PI * 1.5);
+    // Top rectangle
+    ctx.rect(x + radius, y, width - height, height);
+    // Right semicircle
+    ctx.arc(x + width - radius, y + radius, radius, Math.PI * 1.5, Math.PI / 2);
+    ctx.closePath();
+    ctx.fill();
+}
+
+function drawRobot(thrusters) {
+    ctx.clearRect(0, 0, robotCanvas.width, robotCanvas.height);
+
+    const centerX = robotCanvas.width / 2;
+    const centerY = robotCanvas.height / 2;
+
+    // Draw robot body
+    drawPill(centerX,centerY,robotSize / 2,robotSize,"#444")
+
+    // Define 4 thruster positions (top-left, top-right, bottom-left, bottom-right)
+    const offsets = [
+        [-robotSize/2, -robotSize/2],
+        [robotSize/2, -robotSize/2],
+        [-robotSize/2, robotSize/2],
+        [robotSize/2, robotSize/2]
+    ];
+
+    thrusters.forEach((t, i) => {
+        const angleRad = (t.angle - 90) * Math.PI / 180;
+        const length = 50 * t.thrust;
+
+        const x = centerX + offsets[i][0];
+        const y = centerY + offsets[i][1];
+
+        // Draw arrow
+        ctx.strokeStyle = "blue";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + Math.cos(angleRad) * length, y + Math.sin(angleRad) * length);
+        ctx.stroke();
+
+        // Arrowhead
+        const headSize = 8;
+        ctx.beginPath();
+        ctx.moveTo(x + Math.cos(angleRad) * length, y + Math.sin(angleRad) * length);
+        ctx.lineTo(x + Math.cos(angleRad + Math.PI * 0.75) * headSize,
+                   y + Math.sin(angleRad + Math.PI * 0.75) * headSize);
+        ctx.lineTo(x + Math.cos(angleRad - Math.PI * 0.75) * headSize,
+                   y + Math.sin(angleRad - Math.PI * 0.75) * headSize);
+        ctx.closePath();
+        ctx.fillStyle = "blue";
+        ctx.fill();
+    });
+}
+
+function drawIMU(imu) {
+    imuCtx.clearRect(0, 0, imuCanvas.width, imuCanvas.height);
+
+    const centerX = imuCanvas.width / 2;
+    const centerY = imuCanvas.height / 2;
+    const radius = 70;
+
+    // Draw compass circle
+    imuCtx.strokeStyle = "#444";
+    imuCtx.lineWidth = 2;
+    imuCtx.beginPath();
+    imuCtx.arc(centerX, centerY, radius, 0, 2*Math.PI);
+    imuCtx.stroke();
+
+    // Draw yaw as red arrow
+    const yawRad = imu.yaw * Math.PI / 180;
+    imuCtx.strokeStyle = "red";
+    imuCtx.lineWidth = 3;
+    imuCtx.beginPath();
+    imuCtx.moveTo(centerX, centerY);
+    imuCtx.lineTo(centerX + Math.cos(yawRad) * radius, centerY + Math.sin(yawRad) * radius);
+    imuCtx.stroke();
+
+    // Draw roll/pitch as green line inside compass
+    imuCtx.strokeStyle = "green";
+    imuCtx.lineWidth = 2;
+    imuCtx.beginPath();
+    imuCtx.moveTo(centerX, centerY);
+    imuCtx.lineTo(centerX + imu.roll * 2, centerY - imu.pitch * 2);
+    imuCtx.stroke();
+
+    // Text
+    document.getElementById('imuText').innerText = 
+        `Roll: ${imu.roll.toFixed(1)}°, Pitch: ${imu.pitch.toFixed(1)}°, Yaw: ${imu.yaw.toFixed(1)}°`;
+}
+
+function updateBars(thrusters) {
+    thrusters.forEach((t, i) => {
+        const fillEl = document.getElementById(`bar${i}`);
+        fillEl.style.height = `${t.thrust * 100}%`;
+    });
+}
+
+async function fetchStatus() {
+    try {
+        const res = await fetch('/status');
+        const data = await res.json();
+        drawRobot(data.thrusters);
+        drawIMU(data.imu);
+        updateBars(data.thrusters);
+    } catch (err) {
+        console.error('Error fetching status:', err);
+    }
+}
+
+setInterval(fetchStatus, 100);
+</script>
+
+</body>
+</html>
