@@ -6,10 +6,11 @@
 
 class StateNode {
 public:
+    //Starts the state publisher node on the ros network
     StateNode(KalmanFilter* kalman, State* goal_state);
 
+    //this is the overwrite to publish the state
     void publish(const State& state);
-    void subscribe();
     
     //this is the call back from getting to goal state
     void goalStateCallback(const State& incoming_state);

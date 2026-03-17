@@ -21,7 +21,7 @@ public:
 
 private:
     State cur_state;
-    //This is read only in this function, writen fromm the node
+    //This is read only in this function, writen from the node
     State goal_state;
     KalmanFilter kalman;
     StateNode node;
