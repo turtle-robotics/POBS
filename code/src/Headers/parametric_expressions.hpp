@@ -11,7 +11,7 @@ struct Expression
     virtual double evaluate(double x);
 };
 
-//A quatdratic estiamtion function
+//A quadratic estimation function
 struct QuadraticExpression : Expression
 {
     // ax^2+bx+c=y
@@ -27,7 +27,7 @@ struct QuadraticExpression : Expression
     }
 };
 
-//A quatdratic estiamtion function however we can set a bound for the functions.
+//A quadratic estimation function however we can set a bound for the functions.
 struct CheckedQuadraticExpression : QuadraticExpression
 {
     
