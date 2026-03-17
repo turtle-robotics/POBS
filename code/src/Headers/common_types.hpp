@@ -28,6 +28,14 @@ struct Double3
     double c;
 };
 
+//Arbitrary vec3
+template <typename T>
+struct vec3{
+    T a;
+    T b;
+    T c;
+};
+
 //Used to store the input data from a IMU
 struct IMUData
 {
