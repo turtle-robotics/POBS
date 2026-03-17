@@ -1,7 +1,7 @@
 #include "motor_controller.hpp"
 
 //TODO: Implement
-MotorController::MotorController(){
+MotorController::MotorController(State* goal_state, State* current_state){
 
 }
 //TODO: Implement
