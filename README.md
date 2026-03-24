@@ -9,6 +9,7 @@
 - [Team Members](#team-members)
 - [Getting Started](#getting-started)
 - [Contributing](#contributing)
+- [Style Guide](#style)
 - [License](#license)
 
 <!--- 
@@ -231,6 +232,7 @@ We welcome contributions from the open-source community and anyone interested in
 5. Create a pull request to the `main` branch of this repository.
 
 We appreciate all contributions and input from the community, everything is welcome from code snipbits to documentation and any suggestions.
+
 
 ## License
 

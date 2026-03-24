@@ -12,7 +12,7 @@ public:
     //This loads the paramenters for the filter and starts listening
     KalmanFilter(std::string file_name);
     //Starts with default params
-    KalmanFilter(std::string file_name);
+    KalmanFilter();
 
     //Helper function that allows the manual loading of a file   
     void loadParams(std::string file_name);
@@ -28,6 +28,11 @@ public:
     //Takes in a IMU measurement and preforms a observation modifing the state, returns the resulting state
     State measurementIMU(const Orientation& imu_data);
 
+    //Takes in an action of the model
+    //We need to do a lot of modeling of the system however that is not the goal of this function.
+    //Currently the state in this represnted as the 1 second change in values and the 
+    State actionChange(double* transition, double** error);
+
     //Returns the current position
     Position estimatePosition();
     //Returns the current state
@@ -36,13 +41,19 @@ public:
 private:
     FilterParams filter_params;
     State estimated_state;
-
+    double** state_error;
+    long last_update;
+    long last_prediction;
     
 };
 
 //This is the struct that should contain any parameters needed for the filter
 struct FilterParams {
+    double depth_noise;//in m
+    double gps_noise;//in m
+
 };
+
 
 
 #endif

@@ -9,28 +9,22 @@ struct Position
 {
     double x;
     double y;
+    //Positive with increasing depth
     double z;
 };
 
-//used to store the current orientation
+//used to store the current orientation as a quaternion
 struct Orientation
 {
-    double roll;
-    double pitch;
-    double yaw;
+    double l;
+    double i;
+    double j;
+    double k;
 };
 
-//used to store arbitrary 3 vectors
-struct Double3
-{
-    double a;
-    double b;
-    double c;
-};
-
-//Arbitrary vec3
+//Arbitrary 3 Vector
 template <typename T>
-struct vec3{
+struct Vector3{
     T a;
     T b;
     T c;
@@ -40,16 +34,27 @@ struct vec3{
 struct IMUData
 {
     Orientation gyro;
-    Double3 accel;
-    Double3 mag;
+    Vector3<double> accel;
+    Vector3<double> mag;
 };
+
+//The current bias of the IMU
+struct IMUBias{
+    Orientation gyro;
+    Vector3<double> accel;
+};
+
 
 //The current state of the robot
 struct State
 {
+    //This is a global position relative to the initial position. Except the z is relative to the surface, even if the sub starts above that.
     Position position;
+    //This is a relative orientation to the orientation at calibration
     Orientation orientation;
-    Double3 velocites;
+    //This is relative velocities to the current orientation
+    Vector3<double> velocites;
+    IMUBias imu_bias;
 };
 
 
