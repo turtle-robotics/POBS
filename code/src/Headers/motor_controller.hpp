@@ -2,7 +2,6 @@
 #define MOTOR_CONTROLLER_HPP
 
 #include "common_types.hpp"
-#include "parametric_expressions.hpp"
 
 //This takes in the movements and sends the PID signals
 class MotorController {
@@ -14,16 +13,16 @@ public:
     bool commandMotor(int motor_id, double thrust);
 
     //Sets the PWMs to roll the system
-    bool commandRoll(double roll_change);
+    StateTransition commandRoll(double roll_change);
 
     //Sets the PWMs to pitch the system
-    bool commandPitch(double pitch_change);
+    StateTransition commandPitch(double pitch_change);
     
     //Sets the PWMs to yaw the system
-    bool commandYaw(double yaw_change);
+    StateTransition commandYaw(double yaw_change);
 
-    //Sets the PWMs to move forward the system
-    bool commandForward(double acceleration);
+    //Sets the PWMs to move the system forward
+    StateTransition commandForward(double acceleration);
 
 private:
 

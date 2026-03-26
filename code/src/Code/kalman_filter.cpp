@@ -78,8 +78,8 @@ State KalmanFilter::measurementIMU(const Orientation& imu_data){
 }
 
 //TODO: Implement
-State KalmanFilter::actionChange(double* transition, double** error){
-    
+State KalmanFilter::actionChange(StateTransition transition){
+
 }
 
 

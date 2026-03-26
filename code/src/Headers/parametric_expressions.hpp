@@ -8,7 +8,7 @@
 //The reason this exists is to allow the changing of estimation functions in runtime
 struct Expression
 {
-    virtual double evaluate(double x);
+    double evaluate(double x);
 };
 
 //A quadratic estimation function
@@ -58,7 +58,7 @@ struct LinearExpression : Expression
 };
 
 //A bounding check for precenting negative numbers applies a<0 return 0
-double clipNegative(double a){
+inline double clipNegative(double a){
     if(a<0){
         return 0;
     }

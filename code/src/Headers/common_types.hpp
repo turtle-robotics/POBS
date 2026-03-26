@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <functional>
+#include "parametric_expressions.hpp"
 
 //used to store global positions
 struct Position
@@ -57,6 +58,10 @@ struct State
     IMUBias imu_bias;
 };
 
+struct StateTransition{
 
+    double* transition;
+    double** error;
+};
 
 #endif

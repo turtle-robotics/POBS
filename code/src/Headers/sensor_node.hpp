@@ -4,6 +4,10 @@
 #include "common_types.hpp"
 #include <string>
 
+//Use this to store the needed params for the code
+struct SensorParams {
+};
+
 //This node reads the data from the sensors and publishes that to the ros network
 class SensorNode {
 public:
@@ -32,8 +36,6 @@ private:
     double last_pressure;
 };
 
-//Use this to store the needed params for the code
-struct SensorParams {
-};
+
 
 #endif

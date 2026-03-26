@@ -60,7 +60,7 @@ bool rollLeft(double rotations_per_minute){
         double current_force = profiles.forward_thrust_profile_from_microseconds.evaluate(motors[n].microseconds);
         if(motors[n].flags & 0b1 == 0b1){
             int microseconds = profiles.forward_thrust_profile_from_force.evaluate(current_force-force);
-            set_servo_pulsewidth(pi, motors[n].gpio, microseconds);
+            set_servo_pulsewidth(pi, motors[n].gpio, microseconds) ;
             motors[n].microseconds=microseconds;
         }
         if(motors[n].flags & 0b0 == 0b0){

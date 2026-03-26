@@ -20,12 +20,12 @@ public:
 
 
 private:
-    State cur_state;
+    State* cur_state;
     //This is read only in this function, writen from the node
-    State goal_state;
-    KalmanFilter kalman;
-    StateNode node;
-    MotorController motorcontroller;
+    State* goal_state;
+    KalmanFilter* kalman;
+    StateNode* node;
+    MotorController* motorcontroller;
 };
 
 #endif

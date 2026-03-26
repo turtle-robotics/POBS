@@ -4,6 +4,12 @@
 #include "common_types.hpp"
 #include <string>
 
+//This is the struct that should contain any parameters needed for the filter
+struct FilterParams {
+    double depth_noise;//in m
+    double gps_noise;//in m
+};
+
 //Mantains a estimate of the current robot state
 //The current plan is a kalman filter though this might work better with a particle or other filter. 
 //This file should implement a kalman we can create others and swap them out if needed.
@@ -31,7 +37,7 @@ public:
     //Takes in an action of the model
     //We need to do a lot of modeling of the system however that is not the goal of this function.
     //Currently the state in this represnted as the 1 second change in values and the 
-    State actionChange(double* transition, double** error);
+    State actionChange(StateTransition transition);
 
     //Returns the current position
     Position estimatePosition();
@@ -46,14 +52,5 @@ private:
     long last_prediction;
     
 };
-
-//This is the struct that should contain any parameters needed for the filter
-struct FilterParams {
-    double depth_noise;//in m
-    double gps_noise;//in m
-
-};
-
-
 
 #endif

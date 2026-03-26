@@ -4,28 +4,30 @@
 MotorController::MotorController(State* goal_state, State* current_state){
 
 }
+
+
 //TODO: Implement
 bool MotorController::commandMotor(int motor_id, double thrust){
 
 }
 
 //TODO: Implement
-bool MotorController::commandRoll(double roll_change){
+StateTransition MotorController::commandRoll(double roll_change){
 
 }
 
 //TODO: Implement
-bool MotorController::commandPitch(double pitch_change){
+StateTransition MotorController::commandPitch(double pitch_change){
 
 }
 
 //TODO: Implement
-bool MotorController::commandYaw(double yaw_change){
+StateTransition MotorController::commandYaw(double yaw_change){
 
 }
 
 //TODO: Implement
-bool MotorController::commandForward(double acceleration){
+StateTransition MotorController::commandForward(double acceleration){
 
 }
 
