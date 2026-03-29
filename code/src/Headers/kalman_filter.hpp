@@ -8,6 +8,10 @@
 struct FilterParams {
     double depth_noise;//in m
     double gps_noise;//in m
+    double imu_noise_l;
+    double imu_noise_i;
+    double imu_noise_j;
+    double imu_noise_k;
 };
 
 //Mantains a estimate of the current robot state
