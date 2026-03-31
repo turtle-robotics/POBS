@@ -1,6 +1,7 @@
 #include "kalman_filter.hpp"
 #include "json.hpp"
 #include <fstream>
+#include <stdexcept>
 using json = nlohmann::json;
 
 Position KalmanFilter::estimatePosition(){
@@ -14,11 +15,15 @@ State KalmanFilter::estimateState(){
 KalmanFilter::KalmanFilter(std::string file_name){
     loadParams(file_name);
 
-    //Initalize variables
-    state_error=new double*[16];
-    for(int i =0;i<16;i++){
-        state_error[i]=new double[16];
+    // Initialize state error covariance matrix to zero, then set diagonal
+    state_error = new double*[16];
+    for (int i = 0; i < 16; i++) {
+        state_error[i] = new double[16]();  // () zero-initializes
+        state_error[i][i] = 1.0;            // initial uncertainty on each state
     }
+
+    // Identity quaternion (no rotation)
+    estimated_state.orientation = {1.0, 0.0, 0.0, 0.0};
 }
 
 //TODO: Implement
@@ -29,6 +34,9 @@ KalmanFilter::KalmanFilter(){
 //TODO: all added parameters need to be loaded through here
 void KalmanFilter::loadParams(std::string file_name){
     std::ifstream f(file_name);
+    if (!f.is_open()) {
+        throw std::runtime_error("KalmanFilter::loadParams: could not open " + file_name);
+    }
     json data = json::parse(f);
     filter_params.depth_noise=data["depth_noise"];
     filter_params.gps_noise=data["gps_noise"];

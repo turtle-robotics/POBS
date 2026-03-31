@@ -4,7 +4,7 @@
 int main(){
     StateEstimator state;
 
-    state.testFromFile("testFile.dat");
+    state.testFromFile("./Setup files/generatedTest.dat");
 
     return 0;
 }
