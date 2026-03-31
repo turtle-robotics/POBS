@@ -19,22 +19,23 @@ import numpy as np
 
 np.random.seed(42)
 
-NUM_GPS_POINTS   = 10       # total GPS measurements
+NUM_GPS_POINTS   = 20       # total GPS measurements
 DT               = 0.01     # time step between IMU/Depth samples (seconds)
 GPS_INTERVAL     = 100      # IMU/Depth samples per GPS sample
 DEPTH_INTERVAL   = 2
 
 # ─── True state: [x, y, z, vx, vy, vz] ──────
-# Simple constant-velocity trajectory with gentle acceleration
 INITIAL_STATE = np.array([0.0, 0.0, -5.0,   # position (m)  z is depth (negative = below surface)
-                           0.5, 0.2, 0.0])   # velocity (m/s)
+                           0.0, 0.0, 0.0])   # velocity (m/s) — starts from rest, built up by IMU
 
 # ─────────────────────────────────────────────
 # NOISE PARAMETERS  (1-sigma std deviations)
 # ─────────────────────────────────────────────
 
 # IMU measures linear acceleration [ax, ay, az]  (m/s²)
-IMU_STD = np.array([0.05, 0.05, 0.05])
+IMU_STD  = np.array([0.05, 0.05, 0.05])
+# Gyroscope measures angular velocity [wx, wy, wz]  (rad/s)
+GYRO_STD = np.array([0.01, 0.01, 0.01])
 
 # Depth sensor measures z position (m)
 DEPTH_STD = np.array([0.10])
@@ -59,28 +60,82 @@ Q       = np.diag(PROCESS_STD ** 2) # 6×6 process noise covariance
 # SIMPLE STATE PROPAGATION
 # ─────────────────────────────────────────────
 
-def propagate(state: np.ndarray, dt: float) -> np.ndarray:
-    """Constant-velocity model: x_{k+1} = F * x_k"""
+def true_angular_velocity(t: float) -> np.ndarray:
+    """Slow, smooth rotation in all three axes (rad/s)."""
+    return np.array([
+        0.05 * np.sin(0.3 * t),
+        0.03 * np.cos(0.2 * t),
+        0.02 * np.sin(0.1 * t),
+    ])
+
+
+def quat_to_rot(q: np.ndarray) -> np.ndarray:
+    """Unit quaternion [w, x, y, z] -> 3x3 rotation matrix (body -> world)."""
+    w, x, y, z = q
+    return np.array([
+        [1 - 2*(y*y + z*z),   2*(x*y - w*z),       2*(x*z + w*y)],
+        [    2*(x*y + w*z), 1 - 2*(x*x + z*z),       2*(y*z - w*x)],
+        [    2*(x*z - w*y),     2*(y*z + w*x),   1 - 2*(x*x + y*y)],
+    ])
+
+
+def propagate_quat(q: np.ndarray, w_body: np.ndarray, dt: float) -> np.ndarray:
+    """Integrate quaternion kinematics: q_dot = 0.5 * Omega(w) * q."""
+    wx, wy, wz = w_body
+    Omega = 0.5 * np.array([
+        [  0, -wx, -wy, -wz],
+        [ wx,   0,  wz, -wy],
+        [ wy, -wz,   0,  wx],
+        [ wz,  wy, -wx,   0],
+    ])
+    q_new = q + Omega @ q * dt
+    return q_new / np.linalg.norm(q_new)
+
+
+def true_acceleration(t: float) -> np.ndarray:
+    """
+    Smooth time-varying acceleration profile.
+    x: gentle sinusoidal surge
+    y: quarter-frequency sinusoidal sway
+    z: small oscillation around constant depth
+    """
+    return np.array([
+        0.15 * np.sin(0.4 * t),
+        0.10 * np.cos(0.2 * t),
+        0.02 * np.sin(0.6 * t),
+    ])
+
+
+def propagate(state: np.ndarray, dt: float, accel: np.ndarray) -> np.ndarray:
+    """Constant-velocity model + explicit acceleration input."""
     F = np.eye(6)
     F[0, 3] = dt
     F[1, 4] = dt
     F[2, 5] = dt
-    return F @ state + np.random.multivariate_normal(np.zeros(6), Q * dt)
+    next_state = F @ state + np.random.multivariate_normal(np.zeros(6), Q * dt)
+    # Apply true acceleration to velocity
+    next_state[3] += accel[0] * dt
+    next_state[4] += accel[1] * dt
+    next_state[5] += accel[2] * dt
+    return next_state
 
 
 # ─────────────────────────────────────────────
 # MEASUREMENT MODELS
 # ─────────────────────────────────────────────
 
-def measure_imu(state: np.ndarray) -> np.ndarray:
+def measure_imu(a_world: np.ndarray, w_true: np.ndarray,
+                q_true: np.ndarray) -> np.ndarray:
     """
-    IMU reports acceleration.  In an optimal scenario the true acceleration
-    is 0 (constant-velocity model), so each reading is pure noise centred
-    on zero plus any modelled acceleration.
+    IMU reports acceleration and angular rate in body frame.
+    Rotate world-frame accel into body frame, then add independent noise.
+    Returns [ax_body, ay_body, az_body, wx, wy, wz]  shape (6,)
     """
-    true_accel = np.zeros(3)                  # constant-velocity → zero accel
-    noise = np.random.normal(0, IMU_STD)
-    return true_accel + noise                 # shape (3,)
+    R        = quat_to_rot(q_true)          # body -> world
+    a_body   = R.T @ a_world                # world -> body
+    a_meas   = a_body + np.random.normal(0, IMU_STD)
+    w_meas   = w_true + np.random.normal(0, GYRO_STD)
+    return np.concatenate([a_meas, w_meas]) # shape (6,)
 
 
 def measure_depth(state: np.ndarray) -> np.ndarray:
@@ -139,8 +194,9 @@ def generate():
         file.write(f"Format: sensor_name: [values]\n")
         file.write(f"Ratio:  100 IMU + 100 Depth per 1 GPS\n")
 
-        state = INITIAL_STATE.copy()
-        t     = 0.0
+        state  = INITIAL_STATE.copy()
+        q_true = np.array([1.0, 0.0, 0.0, 0.0])  # identity quaternion [w,x,y,z]
+        t      = 0.0
 
         for gps_idx in range(NUM_GPS_POINTS):
             file.write(f"# GPS epoch {gps_idx + 1}  (t = {t:.3f} – {t + GPS_INTERVAL * DT:.3f} s)\n")
@@ -148,10 +204,13 @@ def generate():
             # 100 IMU + 50 Depth samples before each GPS fix
             for i in range(GPS_INTERVAL):
                 for j in range(DEPTH_INTERVAL):
-                    state = propagate(state, DT)
-                    t    += DT
+                    accel  = true_acceleration(t)
+                    w_true = true_angular_velocity(t)
+                    state  = propagate(state, DT, accel)
+                    q_true = propagate_quat(q_true, w_true, DT)
+                    t     += DT
 
-                    imu_meas   = measure_imu(state)
+                    imu_meas = measure_imu(accel, w_true, q_true)
                     file.write(f"IMU:   {fmt_vector(imu_meas)}\n")
 
                 depth_meas = measure_depth(state)

@@ -1,8 +1,8 @@
 {
     "depth_noise": 0.01,
     "gps_noise": 2.25,
-    "imu_noise_l": 0.0025,
-    "imu_noise_i": 0.0025,
-    "imu_noise_j": 0.0025,
-    "imu_noise_k": 0.0025
+    "imu_accel_noise_x": 0.0025,
+    "imu_accel_noise_y": 0.0025,
+    "imu_accel_noise_z": 0.0025,
+    "imu_gyro_noise": 0.0001
 }

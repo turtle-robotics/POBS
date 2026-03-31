@@ -58,13 +58,15 @@ void StateEstimator::testFromFile(std::string filename){
 
     while (std::getline(inFile, line)) {
         if (line.find("IMU:") == 0) {
-            // Parse: IMU:   [  a,   b,   c]
-            double a = 0, b = 0, c = 0;
+            // Parse: IMU:   [  ax,   ay,   az,   wx,   wy,   wz]
+            double ax=0, ay=0, az=0, wx=0, wy=0, wz=0;
             std::istringstream ss(line.substr(line.find('[') + 1));
             char comma;
-            ss >> a >> comma >> b >> comma >> c;
-            Orientation imu{0.0, a, b, c};
-            kalman->measurementIMU(imu);
+            ss >> ax >> comma >> ay >> comma >> az
+               >> comma >> wx >> comma >> wy >> comma >> wz;
+            Vector3<double> accel{ax, ay, az};
+            Vector3<double> gyro {wx, wy, wz};
+            kalman->measurementIMU(accel, gyro, 0.01);
             writeState("IMU");
         } else if (line.find("DEPTH:") == 0) {
             // Parse: DEPTH: [ d]

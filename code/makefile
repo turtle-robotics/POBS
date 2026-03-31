@@ -2,7 +2,7 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -std=c++17 -Wall -Isrc/Headers -Isrc/Libs
+CXXFLAGS = -std=c++17 -Wall -Isrc/Headers -Isrc/Libs -Isrc/Libs/eigen-5.0.0
 
 # Directories
 SRC_DIR = src/Code

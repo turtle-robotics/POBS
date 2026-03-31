@@ -32,9 +32,9 @@ depth = df[df["sensor"] == "DEPTH"]
 gps   = df[df["sensor"] == "GPS"]
 
 # ── Figure layout ─────────────────────────────────────────────────────────────
-fig = plt.figure(figsize=(16, 12))
+fig = plt.figure(figsize=(16, 14))
 fig.suptitle("Kalman Filter Test Results", fontsize=15, fontweight="bold")
-gs = gridspec.GridSpec(3, 2, figure=fig, hspace=0.45, wspace=0.35)
+gs = gridspec.GridSpec(4, 2, figure=fig, hspace=0.50, wspace=0.35)
 
 ax3d  = fig.add_subplot(gs[0, 0], projection="3d")
 ax_xy = fig.add_subplot(gs[0, 1])
@@ -42,6 +42,7 @@ ax_x  = fig.add_subplot(gs[1, 0])
 ax_y  = fig.add_subplot(gs[1, 1])
 ax_z  = fig.add_subplot(gs[2, 0])
 ax_q  = fig.add_subplot(gs[2, 1])
+ax_v  = fig.add_subplot(gs[3, :])
 
 # ── 1. 3-D trajectory ─────────────────────────────────────────────────────────
 ax3d.plot(df["pos_x"], df["pos_y"], df["pos_z"],
@@ -89,6 +90,16 @@ ax_q.axhline(0, color="black", lw=0.5, ls="--")
 ax_q.set_xlabel("Step"); ax_q.set_ylabel("Component value")
 ax_q.set_title("Orientation Quaternion over time")
 ax_q.legend(fontsize=7); ax_q.grid(True, alpha=0.3)
+
+# ── 5. Estimated velocity ─────────────────────────────────────────────────────
+for comp, col, color in [("vx", "vel_a", "royalblue"),
+                          ("vy", "vel_b", "seagreen"),
+                          ("vz", "vel_c", "firebrick")]:
+    ax_v.plot(df["step"], df[col], lw=1, label=comp, color=color)
+_mark_sensors(ax_v)
+ax_v.set_xlabel("Step"); ax_v.set_ylabel("m/s")
+ax_v.set_title("Estimated Velocity over time (integrated from IMU acceleration)")
+ax_v.legend(fontsize=8); ax_v.grid(True, alpha=0.3)
 
 # ── Sensor update counts (text box) ──────────────────────────────────────────
 counts = df["sensor"].value_counts()
