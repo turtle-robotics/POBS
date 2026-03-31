@@ -117,49 +117,50 @@ def fmt_vector(v: np.ndarray) -> str:
 # ─────────────────────────────────────────────
 
 def generate():
-    print("=" * 60)
-    print("KALMAN FILTER TEST DATA")
-    print("Optimal scenario: linear, independent Gaussian noise")
-    print("=" * 60)
+    with open("generatedTest.dat","w") as file:
+        file.write("=" * 60)
+        file.write("\nKALMAN FILTER TEST DATA\n")
+        file.write("Optimal scenario: linear, independent Gaussian noise\n")
+        file.write("=" * 60)
 
-    # ── Noise matrices ────────────────────────
-    print("\n--- NOISE MATRICES ---\n")
-    print(fmt_matrix("R_imu   (IMU measurement noise covariance)", R_imu))
-    print()
-    print(fmt_matrix("R_depth (Depth measurement noise covariance)", R_depth))
-    print()
-    print(fmt_matrix("R_gps   (GPS measurement noise covariance)", R_gps))
-    print()
-    print(fmt_matrix("Q       (Process noise covariance)", Q))
-    print()
+        # ── Noise matrices ────────────────────────
+        file.write("\n--- NOISE MATRICES ---\n")
+        file.write(fmt_matrix("R_imu   (IMU measurement noise covariance)\n", R_imu))
+        file.write("")
+        file.write(fmt_matrix("R_depth (Depth measurement noise covariance)\n", R_depth))
+        file.write("")
+        file.write(fmt_matrix("R_gps   (GPS measurement noise covariance)\n", R_gps))
+        file.write("")
+        file.write(fmt_matrix("Q       (Process noise covariance)\n", Q))
+        file.write("")
 
-    # ── Sensor data ───────────────────────────
-    print("--- SENSOR DATA ---")
-    print(f"Format: sensor_name: [values]")
-    print(f"Ratio:  100 IMU + 100 Depth per 1 GPS\n")
+        # ── Sensor data ───────────────────────────
+        file.write("--- SENSOR DATA ---\n")
+        file.write(f"Format: sensor_name: [values]\n")
+        file.write(f"Ratio:  100 IMU + 100 Depth per 1 GPS\n")
 
-    state = INITIAL_STATE.copy()
-    t     = 0.0
+        state = INITIAL_STATE.copy()
+        t     = 0.0
 
-    for gps_idx in range(NUM_GPS_POINTS):
-        print(f"# GPS epoch {gps_idx + 1}  (t = {t:.3f} – {t + GPS_INTERVAL * DT:.3f} s)")
+        for gps_idx in range(NUM_GPS_POINTS):
+            file.write(f"# GPS epoch {gps_idx + 1}  (t = {t:.3f} – {t + GPS_INTERVAL * DT:.3f} s)\n")
 
-        # 100 IMU + 100 Depth samples before each GPS fix
-        for i in range(GPS_INTERVAL):
-            for j in range(DEPTH_INTERVAL):
-                state = propagate(state, DT)
-                t    += DT
+            # 100 IMU + 100 Depth samples before each GPS fix
+            for i in range(GPS_INTERVAL):
+                for j in range(DEPTH_INTERVAL):
+                    state = propagate(state, DT)
+                    t    += DT
 
-                imu_meas   = measure_imu(state)
-                print(f"IMU:   {fmt_vector(imu_meas)}")
+                    imu_meas   = measure_imu(state)
+                    file.write(f"IMU:   {fmt_vector(imu_meas)}\n")
 
-            depth_meas = measure_depth(state)
-            print(f"DEPTH: {fmt_vector(depth_meas)}")
+                depth_meas = measure_depth(state)
+                file.write(f"DEPTH: {fmt_vector(depth_meas)}\n")
 
-        # One GPS measurement
-        gps_meas = measure_gps(state)
-        print(f"GPS:   {fmt_vector(gps_meas)}")
-        print()
+            # One GPS measurement
+            gps_meas = measure_gps(state)
+            file.write(f"GPS:   {fmt_vector(gps_meas)}\n")
+            file.write("")
 
 
 if __name__ == "__main__":
