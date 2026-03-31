@@ -9,6 +9,7 @@
 - [Team Members](#team-members)
 - [Getting Started](#getting-started)
 - [Contributing](#contributing)
+- [Style Guide](#style)
 - [License](#license)
 
 <!--- 
@@ -115,9 +116,9 @@ This team is responsable for the programming and electrical component of the sub
   - Role: X
   - Year: X
 
-- **[Aidan Briggs](https://www.linkedin.com/in/name)**
+- **[Aidan Briggs](https://www.linkedin.com/in/Aidanbriggs)**
   - Major: Computer Science
-  - Role: Eletrical Team Lead
+  - Role: Electrical Team Lead
   - Year: 2026
 
 - **[Jenson Jibrail](https://www.linkedin.com/in/name)**
@@ -231,6 +232,7 @@ We welcome contributions from the open-source community and anyone interested in
 5. Create a pull request to the `main` branch of this repository.
 
 We appreciate all contributions and input from the community, everything is welcome from code snipbits to documentation and any suggestions.
+
 
 ## License
 
