@@ -23,7 +23,9 @@ double pressureToDepth(double pressure,double atmospheric_pressure, bool is_fres
     return gauge_pressure / (SaltwaterDensity * G);
 }
 
-
+double umsToDuty(int ums){
+    return ums/20000.0;
+}
 
 
 #endif

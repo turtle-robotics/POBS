@@ -145,7 +145,7 @@ def generate():
         for gps_idx in range(NUM_GPS_POINTS):
             file.write(f"# GPS epoch {gps_idx + 1}  (t = {t:.3f} – {t + GPS_INTERVAL * DT:.3f} s)\n")
 
-            # 100 IMU + 100 Depth samples before each GPS fix
+            # 100 IMU + 50 Depth samples before each GPS fix
             for i in range(GPS_INTERVAL):
                 for j in range(DEPTH_INTERVAL):
                     state = propagate(state, DT)
