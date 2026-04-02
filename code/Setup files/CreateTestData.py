@@ -10,6 +10,7 @@ Output format:
   2. Sensor readings: sensor_name: data
      - 100 IMU + 100 Depth readings per 1 GPS reading
 """
+import math
 
 import numpy as np
 
@@ -21,12 +22,16 @@ np.random.seed(42)
 
 NUM_GPS_POINTS   = 20       # total GPS measurements
 DT               = 0.01     # time step between IMU/Depth samples (seconds)
-GPS_INTERVAL     = 100      # IMU/Depth samples per GPS sample
-DEPTH_INTERVAL   = 2
+GPS_INTERVAL     = 1000      # IMU/Depth samples per GPS sample
+DEPTH_INTERVAL   = 3
 
 # ─── True state: [x, y, z, vx, vy, vz] ──────
 INITIAL_STATE = np.array([0.0, 0.0, -5.0,   # position (m)  z is depth (negative = below surface)
                            0.0, 0.0, 0.0])   # velocity (m/s) — starts from rest, built up by IMU
+
+# proportional gain — tune this for faster/slower correction
+Rotational_gain = 0.2
+Acceleration_gain = 1
 
 # ─────────────────────────────────────────────
 # NOISE PARAMETERS  (1-sigma std deviations)
@@ -38,7 +43,7 @@ IMU_STD  = np.array([0.05, 0.05, 0.05])
 GYRO_STD = np.array([0.01, 0.01, 0.01])
 
 # Depth sensor measures z position (m)
-DEPTH_STD = np.array([0.10])
+DEPTH_STD = np.array([0.04])
 
 # GPS measures x, y position (m)  — lower update rate, higher positional noise
 GPS_STD = np.array([1.50, 1.50])
@@ -60,13 +65,16 @@ Q       = np.diag(PROCESS_STD ** 2) # 6×6 process noise covariance
 # SIMPLE STATE PROPAGATION
 # ─────────────────────────────────────────────
 
-def true_angular_velocity(t: float) -> np.ndarray:
-    """Slow, smooth rotation in all three axes (rad/s)."""
-    return np.array([
-        0.05 * np.sin(0.3 * t),
-        0.03 * np.cos(0.2 * t),
-        0.02 * np.sin(0.1 * t),
-    ])
+def true_angular_velocity(t: float, rot) -> np.ndarray:
+    """Should take the current value and slowly correct it to 0"""
+
+    # Extract axis-angle from rotation matrix via the skew-symmetric part
+    # R = I + sin(θ)·K + (1-cos(θ))·K²  →  (R - Rᵀ)/2 = sin(θ)·K
+    skew = (rot - rot.T) / 2.0
+    sin_theta = np.array([skew[2, 1], skew[0, 2], skew[1, 0]])
+
+    # sin_theta ≈ axis * sin(angle); negate to drive rotation toward identity
+    return -Rotational_gain * sin_theta
 
 
 def quat_to_rot(q: np.ndarray) -> np.ndarray:
@@ -92,19 +100,13 @@ def propagate_quat(q: np.ndarray, w_body: np.ndarray, dt: float) -> np.ndarray:
     return q_new / np.linalg.norm(q_new)
 
 
-def true_acceleration(t: float) -> np.ndarray:
-    """
-    Smooth time-varying acceleration profile.
-    x: gentle sinusoidal surge
-    y: quarter-frequency sinusoidal sway
-    z: small oscillation around constant depth
-    """
-    return np.array([
-        0.15 * np.sin(0.4 * t),
-        0.10 * np.cos(0.2 * t),
-        0.02 * np.sin(0.6 * t),
-    ])
+def true_acceleration(cur_vel: np.ndarray, goal_vel: np.ndarray) -> np.ndarray:
+    """Returns an acceleration that drives cur_vel toward goal_vel."""
+    return Acceleration_gain * (goal_vel - cur_vel)
 
+
+def find_goal_vel(t:float):
+    return np.array([5*(-abs(math.sin(t/math.pi/100))+.5*math.sin(2*t/math.pi/100)),3,3])
 
 def propagate(state: np.ndarray, dt: float, accel: np.ndarray) -> np.ndarray:
     """Constant-velocity model + explicit acceleration input."""
@@ -204,8 +206,8 @@ def generate():
             # 100 IMU + 50 Depth samples before each GPS fix
             for i in range(GPS_INTERVAL):
                 for j in range(DEPTH_INTERVAL):
-                    accel  = true_acceleration(t)
-                    w_true = true_angular_velocity(t)
+                    accel  = true_acceleration(state[3:],find_goal_vel(t))
+                    w_true = true_angular_velocity(t,quat_to_rot(q_true))
                     state  = propagate(state, DT, accel)
                     q_true = propagate_quat(q_true, w_true, DT)
                     t     += DT

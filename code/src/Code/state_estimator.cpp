@@ -82,7 +82,7 @@ void StateEstimator::testFromFile(std::string filename){
             char comma;
             ss >> x >> comma >> y;
             Position gps{x, y, 0.0};
-            kalman->measurementGPS(gps);
+            kalman->measurementGPSPosition(gps);
             writeState("GPS");
         }
     }

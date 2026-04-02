@@ -35,7 +35,12 @@ public:
     void loadParams(std::string file_name);
 
     //Takes in a GPS measurement and preforms a observation modifing the state, returns the resulting state
-    State measurementGPS(const Position& gps_data);
+    //Assuemes that the sub is currently surfaced when doing so. Resets rotations
+    State measurementGPSPosition(const Position& gps_data);
+
+    //Takes in a GPS measurement and preforms a observation modifing the state, returns the resulting state
+    //Assuemes that the sub is currently surfaced when doing so.
+    State measurementGPSVelocity(const Vector3<double>& gps_data);
 
     //Takes in a depth pressure measurement and preforms a observation modifing the state, returns the resulting state
     State measurementDepth(double pressure);

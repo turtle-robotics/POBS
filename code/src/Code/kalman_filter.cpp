@@ -173,7 +173,11 @@ State KalmanFilter::measurementIMU(const Vector3<double>& accel_body,
 
 // ── GPS measurement update ─────────────────────────────────────────────────
 
-State KalmanFilter::measurementGPS(const Position& gps_data) {
+State KalmanFilter::measurementGPSVelocity(const Vector3<double>& gps_data){
+    
+}
+
+State KalmanFilter::measurementGPSPosition(const Position& gps_data) {
     // H (2x10): observes pos_x, pos_y
     Eigen::MatrixXd H = Eigen::MatrixXd::Zero(2, 10);
     H(0, 0) = 1.0;
