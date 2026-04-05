@@ -1,0 +1,5 @@
+{
+    "arrival_threshold":   0.5,
+    "max_turn_radius":     1.0,
+    "intermediate_points": 5
+}

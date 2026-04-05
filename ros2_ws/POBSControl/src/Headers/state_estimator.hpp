@@ -5,6 +5,7 @@
 #include "state_node.hpp"
 #include "motor_controller.hpp"
 #include <string>
+#include <memory>
 
 
 //Stores all logic relating to ensuting to goal state is aquired
@@ -22,12 +23,15 @@ public:
     //Uses the file to preform tests
     void testFromFile(std::string filename);
 
+    // Returns the internal ROS2 node so it can be added to an executor
+    std::shared_ptr<StateNode> getNode();
+
 private:
     State* cur_state;
     //This is read only in this function, writen from the node
     State* goal_state;
     KalmanFilter* kalman;
-    StateNode* node;
+    std::shared_ptr<StateNode> node;
     MotorController* motorcontroller;
 };
 

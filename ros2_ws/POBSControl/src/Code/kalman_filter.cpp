@@ -225,6 +225,10 @@ State KalmanFilter::measurementDepth(double depth_meters) {
     return toState();
 }
 
+double KalmanFilter::errorMagnitude(){
+    return std::sqrt(P_.trace());
+}
+
 Position KalmanFilter::estimatePosition() { return toState().position; }
 State    KalmanFilter::estimateState()    { return toState(); }
 

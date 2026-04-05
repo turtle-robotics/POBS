@@ -9,7 +9,7 @@ StateEstimator::StateEstimator(){
     cur_state = new State;
     goal_state = new State;
     kalman = new KalmanFilter("src/Json/extended_kalman.json");
-    node = new StateNode(kalman,goal_state);
+    node = std::make_shared<StateNode>(kalman, goal_state);
     motorcontroller = new MotorController(goal_state,cur_state);
     
 }
@@ -88,6 +88,10 @@ void StateEstimator::testFromFile(std::string filename){
     }
 
     std::cout << "testFromFile: wrote " << step << " states to " << outName << std::endl;
+}
+
+std::shared_ptr<StateNode> StateEstimator::getNode() {
+    return node;
 }
 
 //TODO: Implement

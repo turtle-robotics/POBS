@@ -61,6 +61,8 @@ public:
     //Returns the current state
     State estimateState();
 
+    double errorMagnitude();
+
 private:
     FilterParams filter_params;
 

@@ -1,4 +1,7 @@
-code/build
+ros2_ws/build
+ros2_ws/log
+ros2_ws/install
+ros2_ws/POBSControl/build
 .vscode
 .idea
-code/src/Libs/eigen-5.0.0
+ros2_ws/POBSControl/src/Libs/eigen-5.0.0
