@@ -10,7 +10,6 @@ struct Position
 {
     double x;
     double y;
-    //Positive with increasing depth
     double z;
 };
 
