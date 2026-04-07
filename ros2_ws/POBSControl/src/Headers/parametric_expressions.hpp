@@ -8,7 +8,8 @@
 //The reason this exists is to allow the changing of estimation functions in runtime
 struct Expression
 {
-    double evaluate(double x);
+    virtual double evaluate(double x) = 0;
+    virtual ~Expression() = default;
 };
 
 //A quadratic estimation function

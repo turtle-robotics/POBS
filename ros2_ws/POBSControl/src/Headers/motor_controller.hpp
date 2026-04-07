@@ -2,6 +2,8 @@
 #define MOTOR_CONTROLLER_HPP
 
 #include "common_types.hpp"
+#include "parametric_expressions.hpp"
+#include <memory>
 #include <string>
 
 // PID state for one degree of freedom.
@@ -84,7 +86,7 @@ private:
 
     double thrusts[6];
     double pwms[6];
-    Expression thrust_to_pwms[6];
+    std::shared_ptr<Expression> thrust_to_pwms[6];
 
     //This is read only in this function modified in the estimator
     State* goal_state;

@@ -6,9 +6,11 @@
             "PWM_Pin":6,
             "Profile":"T200_Profile.json",
             "Thrust_Limit":0.25,
+            //[surge, sway, heave, roll, pitch, yaw]
             "Motor_Mix":[  0.0,   0.0,  -1.0,  -1.0,   0.0,   0.0 ]
         }
     ],
-    "Thrust_limit":0.5
+    "max_thrust_limit":0.5,
+    "dt":0.1
 
 }

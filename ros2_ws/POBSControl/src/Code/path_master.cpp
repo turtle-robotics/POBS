@@ -20,9 +20,9 @@ static constexpr int    DEFAULT_INTERP_PTS   = 5;
 
 MasterPather::MasterPather(std::string file_name)
     : rclcpp::Node("master_pather"),
-      error_mag(0.0),
+      state_error_mag(0.0),
       waypoint_idx_(0),
-      path_params_{DEFAULT_THRESHOLD, DEFAULT_TURN_RADIUS, DEFAULT_INTERP_PTS},
+      path_params_{DEFAULT_THRESHOLD, DEFAULT_TURN_RADIUS, DEFAULT_INTERP_PTS,.1},
       cur_position_{0.0, 0.0, 0.0}
 {
     // Publisher: goal state for the sub to navigate toward
@@ -128,7 +128,7 @@ void MasterPather::stateCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
 
     double error_mag = positionDistance(cur_position_, goal_state.position);
 
-    if(odometryVarianceMagnitude(msg)>path_params_.surface_error_threshold){
+    if(odometryVarianceMagnitude(*msg)>path_params_.surface_error_threshold){
         is_surfacing=true;
 
         RCLCPP_INFO(this->get_logger(),
@@ -146,7 +146,7 @@ void MasterPather::stateCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
             waypoint_idx_++;
         }
         else{
-            is_surfacing=false;
+            is_surfacing=false;//Dosen't stay on the surface for any amount of time.
         }
         goal_state = waypoints_[waypoint_idx_];
 

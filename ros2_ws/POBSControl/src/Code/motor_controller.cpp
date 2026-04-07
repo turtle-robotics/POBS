@@ -126,7 +126,6 @@ void MotorController::quatToEuler(const Orientation& q,
     double cosy_cosp = 1.0 - 2.0 * (y*y + z*z);
     yaw = std::atan2(siny_cosp, cosy_cosp);
 }
-
 // Rotates a world-frame XY position error into body-frame surge/sway.
 // Uses the top two rows of Rᵀ where R is the body-to-world rotation.
 static void worldToBody(const Orientation& q,
@@ -158,7 +157,7 @@ void MotorController::applyMix(double surge, double sway, double heave,
     }
     normalizeThrusts();
     for (int m = 0; m < 6; m++)
-        pwms[m] = thrust_to_pwms[m].evaluate(thrusts[m]);
+        pwms[m] = thrust_to_pwms[m] ? thrust_to_pwms[m]->evaluate(thrusts[m]) : 0.0;
 }
 
 // Scales all thrusts proportionally so no motor exceeds max_motor_thrust.
@@ -209,48 +208,27 @@ StateTransition MotorController::commandForward(double acceleration) {
 // Any key present in the file overwrites the corresponding in-memory value;
 // missing keys leave the current value (constructor defaults) unchanged.
 // Returns false if the file cannot be opened or contains malformed JSON.
-//Terrible AI code
 bool MotorController::loadParams(std::string file_name) {
     std::ifstream f(file_name);
     if (!f.is_open()) return false;
 
     try {
-        // ignore_comments=true: allows // and /* */ in the config file
         nlohmann::json j = nlohmann::json::parse(f, nullptr, true, true);
 
-        if (j.contains("dt"))               dt               = j["dt"].get<double>();
-        if (j.contains("max_motor_thrust")) max_motor_thrust = j["max_motor_thrust"].get<double>();
+        if (j.contains("dt"))                dt               = j["dt"].get<double>();
+        if (j.contains("max_thrust_limit"))  max_motor_thrust = j["max_thrust_limit"].get<double>();
 
-        // Motor mixing matrix — must be exactly 6 rows × 6 columns
-        if (j.contains("motor_mix")) {
-            const auto& mix = j["motor_mix"];
-            if (mix.size() != 6) return false;
-            for (int m = 0; m < 6; m++) {
-                if (mix[m].size() != 6) return false;
+        // Motor mixing matrix — one row per thruster entry, up to 6
+        if (j.contains("Thrusters")) {
+            const auto& thrusters = j["Thrusters"];
+            if (thrusters.size() > 6) return false;
+            for (size_t m = 0; m < thrusters.size(); m++) {
+                const auto& mix = thrusters[m]["Motor_Mix"];
+                if (mix.size() != 6) return false;
                 for (int d = 0; d < 6; d++)
-                    motor_mix[m][d] = mix[m][d].get<double>();
+                    motor_mix[m][d] = mix[d].get<double>();
             }
         }
-
-        // Helper lambda to load one PID block — only overwrites present keys
-        auto loadPID = [&](const std::string& key, PIDState& pid) {
-            if (!j.contains(key)) return;
-            const auto& p = j[key];
-            if (p.contains("kp"))           pid.kp           = p["kp"].get<double>();
-            if (p.contains("ki"))           pid.ki           = p["ki"].get<double>();
-            if (p.contains("kd"))           pid.kd           = p["kd"].get<double>();
-            if (p.contains("max_integral")) pid.max_integral = p["max_integral"].get<double>();
-            // Reset runtime state so old integral/derivative don't pollute new gains
-            pid.integral   = 0.0;
-            pid.prev_error = 0.0;
-        };
-
-        loadPID("pid_surge", pid_surge);
-        loadPID("pid_sway",  pid_sway);
-        loadPID("pid_heave", pid_heave);
-        loadPID("pid_roll",  pid_roll);
-        loadPID("pid_pitch", pid_pitch);
-        loadPID("pid_yaw",   pid_yaw);
 
     } catch (...) {
         return false;
