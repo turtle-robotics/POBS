@@ -4,5 +4,6 @@
     "imu_accel_noise_x": 0.0025,
     "imu_accel_noise_y": 0.0025,
     "imu_accel_noise_z": 0.0025,
-    "imu_gyro_noise": 0.0001
+    "imu_gyro_noise": 0.0001,
+    "surface_orientation_noise": 0.001
 }

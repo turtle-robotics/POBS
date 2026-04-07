@@ -20,13 +20,13 @@ import numpy as np
 
 np.random.seed(42)
 
-NUM_GPS_POINTS   = 20       # total GPS measurements
+NUM_GPS_POINTS   = 10       # total GPS measurements
 DT               = 0.01     # time step between IMU/Depth samples (seconds)
-GPS_INTERVAL     = 1000      # IMU/Depth samples per GPS sample
+GPS_INTERVAL     = 10000      # IMU/Depth samples per GPS sample
 DEPTH_INTERVAL   = 3
 
 # ─── True state: [x, y, z, vx, vy, vz] ──────
-INITIAL_STATE = np.array([0.0, 0.0, -5.0,   # position (m)  z is depth (negative = below surface)
+INITIAL_STATE = np.array([0.0, 0.0, -0.01,   # position (m)  z is depth (negative = below surface)
                            0.0, 0.0, 0.0])   # velocity (m/s) — starts from rest, built up by IMU
 
 # proportional gain — tune this for faster/slower correction
@@ -48,6 +48,9 @@ DEPTH_STD = np.array([0.04])
 # GPS measures x, y position (m)  — lower update rate, higher positional noise
 GPS_STD = np.array([1.50, 1.50])
 
+# GPS Doppler velocity estimate [vx, vy]  (m/s)  — only valid when surfaced
+GPS_VEL_STD = np.array([0.15, 0.15])
+
 # Process noise std for state propagation [x, y, z, vx, vy, vz]
 PROCESS_STD = np.array([0.001, 0.001, 0.001,
                          0.010, 0.010, 0.010])
@@ -56,10 +59,11 @@ PROCESS_STD = np.array([0.001, 0.001, 0.001,
 # NOISE MATRICES
 # ─────────────────────────────────────────────
 
-R_imu   = np.diag(IMU_STD   ** 2)   # 3×3
-R_depth = np.diag(DEPTH_STD ** 2)   # 1×1
-R_gps   = np.diag(GPS_STD   ** 2)   # 2×2
-Q       = np.diag(PROCESS_STD ** 2) # 6×6 process noise covariance
+R_imu     = np.diag(IMU_STD     ** 2)   # 3×3
+R_depth   = np.diag(DEPTH_STD   ** 2)   # 1×1
+R_gps     = np.diag(GPS_STD     ** 2)   # 2×2
+R_gps_vel = np.diag(GPS_VEL_STD ** 2)   # 2×2
+Q         = np.diag(PROCESS_STD ** 2)   # 6×6 process noise covariance
 
 # ─────────────────────────────────────────────
 # SIMPLE STATE PROPAGATION
@@ -106,7 +110,7 @@ def true_acceleration(cur_vel: np.ndarray, goal_vel: np.ndarray) -> np.ndarray:
 
 
 def find_goal_vel(t:float):
-    return np.array([5*(-abs(math.sin(t/math.pi/100))+.5*math.sin(2*t/math.pi/100)),3,3])
+    return np.array([3*math.sin(t*math.pi/100)+.5,3*math.sin(t*math.pi/100)+.5,5*(-math.sin((t*math.pi/100))+.5*math.sin(2*t*math.pi/100))])
 
 def propagate(state: np.ndarray, dt: float, accel: np.ndarray) -> np.ndarray:
     """Constant-velocity model + explicit acceleration input."""
@@ -154,6 +158,13 @@ def measure_gps(state: np.ndarray) -> np.ndarray:
     return true_xy + noise                    # shape (2,)
 
 
+def measure_gps_velocity(state: np.ndarray) -> np.ndarray:
+    """GPS Doppler velocity: observe vx, vy.  vz assumed zero (surfaced)."""
+    true_vxy = state[3:5]
+    noise    = np.random.normal(0, GPS_VEL_STD)
+    return true_vxy + noise                   # shape (2,)
+
+
 # ─────────────────────────────────────────────
 # HELPERS
 # ─────────────────────────────────────────────
@@ -173,8 +184,14 @@ def fmt_vector(v: np.ndarray) -> str:
 # MAIN GENERATION
 # ─────────────────────────────────────────────
 
+TRUE_STATE_INTERVAL = 100  # IMU samples between true-state CSV rows
+
 def generate():
-    with open("generatedTest.dat","w") as file:
+    with open("generatedTest.dat", "w") as file, \
+         open("trueState.csv", "w") as csv:
+
+        csv.write("t,x,y,z,vx,vy,vz\n")
+
         file.write("=" * 60)
         file.write("\nKALMAN FILTER TEST DATA\n")
         file.write("Optimal scenario: linear, independent Gaussian noise\n")
@@ -188,6 +205,8 @@ def generate():
         file.write("")
         file.write(fmt_matrix("R_gps   (GPS measurement noise covariance)\n", R_gps))
         file.write("")
+        file.write(fmt_matrix("R_gps_vel (GPS velocity noise covariance)\n", R_gps_vel))
+        file.write("")
         file.write(fmt_matrix("Q       (Process noise covariance)\n", Q))
         file.write("")
 
@@ -196,31 +215,38 @@ def generate():
         file.write(f"Format: sensor_name: [values]\n")
         file.write(f"Ratio:  100 IMU + 100 Depth per 1 GPS\n")
 
-        state  = INITIAL_STATE.copy()
-        q_true = np.array([1.0, 0.0, 0.0, 0.0])  # identity quaternion [w,x,y,z]
-        t      = 0.0
+        state     = INITIAL_STATE.copy()
+        q_true    = np.array([1.0, 0.0, 0.0, 0.0])  # identity quaternion [w,x,y,z]
+        t         = 0.0
+        imu_count = 0
 
         for gps_idx in range(NUM_GPS_POINTS):
             file.write(f"# GPS epoch {gps_idx + 1}  (t = {t:.3f} – {t + GPS_INTERVAL * DT:.3f} s)\n")
 
-            # 100 IMU + 50 Depth samples before each GPS fix
             for i in range(GPS_INTERVAL):
                 for j in range(DEPTH_INTERVAL):
-                    accel  = true_acceleration(state[3:],find_goal_vel(t))
-                    w_true = true_angular_velocity(t,quat_to_rot(q_true))
+                    accel  = true_acceleration(state[3:], find_goal_vel(t))
+                    w_true = true_angular_velocity(t, quat_to_rot(q_true))
                     state  = propagate(state, DT, accel)
                     q_true = propagate_quat(q_true, w_true, DT)
                     t     += DT
+                    imu_count += 1
 
                     imu_meas = measure_imu(accel, w_true, q_true)
                     file.write(f"IMU:   {fmt_vector(imu_meas)}\n")
 
+                    if imu_count % TRUE_STATE_INTERVAL == 0:
+                        csv.write(f"{t:.4f},{state[0]:.6f},{state[1]:.6f},{state[2]:.6f},"
+                                  f"{state[3]:.6f},{state[4]:.6f},{state[5]:.6f}\n")
+
                 depth_meas = measure_depth(state)
                 file.write(f"DEPTH: {fmt_vector(depth_meas)}\n")
 
-            # One GPS measurement
-            gps_meas = measure_gps(state)
-            file.write(f"GPS:   {fmt_vector(gps_meas)}\n")
+            # One GPS position + velocity measurement (sub is surfaced)
+            gps_meas     = measure_gps(state)
+            gps_vel_meas = measure_gps_velocity(state)
+            file.write(f"GPS:     {fmt_vector(gps_meas)}\n")
+            file.write(f"GPS_VEL: {fmt_vector(gps_vel_meas)}\n")
             file.write("")
 
 

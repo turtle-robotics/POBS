@@ -2,7 +2,7 @@
 #define STATE_ESTIMATOR_HPP
 
 #include "common_types.hpp"
-#include "state_node.hpp"
+#include "kalman_filter.hpp"
 #include "motor_controller.hpp"
 #include <string>
 #include <memory>

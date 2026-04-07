@@ -91,7 +91,8 @@ void KalmanFilter::loadParams(std::string file_name) {
     filter_params.imu_accel_noise_x = data["imu_accel_noise_x"];
     filter_params.imu_accel_noise_y = data["imu_accel_noise_y"];
     filter_params.imu_accel_noise_z = data["imu_accel_noise_z"];
-    filter_params.imu_gyro_noise    = data["imu_gyro_noise"];
+    filter_params.imu_gyro_noise            = data["imu_gyro_noise"];
+    filter_params.surface_orientation_noise = data["surface_orientation_noise"];
 }
 
 // ── IMU prediction step (EKF) ──────────────────────────────────────────────
@@ -174,7 +175,49 @@ State KalmanFilter::measurementIMU(const Vector3<double>& accel_body,
 // ── GPS measurement update ─────────────────────────────────────────────────
 
 State KalmanFilter::measurementGPSVelocity(const Vector3<double>& gps_data){
-    
+    // H (7x10): observes vel_x, vel_y, vel_z (indices 3-5) and
+    //           quaternion q_l, q_i, q_j, q_k (indices 6-9).
+    // The sub is surfaced, so orientation naturally returns to identity [1,0,0,0].
+    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(7, 10);
+    H(0, 3) = 1.0;   // vx
+    H(1, 4) = 1.0;   // vy
+    H(2, 5) = 1.0;   // vz
+    H(3, 6) = 1.0;   // q_l
+    H(4, 7) = 1.0;   // q_i
+    H(5, 8) = 1.0;   // q_j
+    H(6, 9) = 1.0;   // q_k
+
+    Eigen::MatrixXd R = Eigen::MatrixXd::Zero(7, 7);
+    R(0, 0) = filter_params.gps_noise;
+    R(1, 1) = filter_params.gps_noise;
+    R(2, 2) = filter_params.gps_noise;
+    R(3, 3) = filter_params.surface_orientation_noise;
+    R(4, 4) = filter_params.surface_orientation_noise;
+    R(5, 5) = filter_params.surface_orientation_noise;
+    R(6, 6) = filter_params.surface_orientation_noise;
+
+    // vz assumed zero (surfaced); orientation target is identity quaternion
+    Eigen::VectorXd z(7);
+    z(0) = gps_data.a;
+    z(1) = gps_data.b;
+    z(2) = 0.0;
+    z(3) = 1.0;   // q_l target
+    z(4) = 0.0;   // q_i target
+    z(5) = 0.0;   // q_j target
+    z(6) = 0.0;   // q_k target
+
+    Eigen::VectorXd innov = z - H * x_;
+    Eigen::MatrixXd S     = H * P_ * H.transpose() + R;
+    Eigen::MatrixXd K     = P_ * H.transpose() * S.inverse();
+
+    x_ = x_ + K * innov;
+
+    // Renormalize quaternion after orientation correction
+    x_.tail(4).normalize();
+
+    P_ = (Eigen::MatrixXd::Identity(10, 10) - K * H) * P_;
+
+    return toState();
 }
 
 State KalmanFilter::measurementGPSPosition(const Position& gps_data) {

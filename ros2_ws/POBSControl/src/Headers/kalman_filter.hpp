@@ -7,13 +7,15 @@
 
 //This is the struct that should contain any parameters needed for the filter
 struct FilterParams {
-    double depth_noise;        // depth measurement variance (m^2)
-    double gps_noise;          // GPS measurement variance (m^2)
-    double imu_accel_noise_x;  // accelerometer variance (m/s^2)^2
+    double depth_noise;              // depth measurement variance (m^2)
+    double gps_noise;                // GPS measurement variance (m^2)
+    double imu_accel_noise_x;        // accelerometer variance (m/s^2)^2
     double imu_accel_noise_y;
     double imu_accel_noise_z;
-    double imu_gyro_noise;     // gyroscope variance (rad/s)^2
+    double imu_gyro_noise;           // gyroscope variance (rad/s)^2
+    double surface_orientation_noise; // orientation reset variance when surfaced (quaternion units^2)
 };
+
 
 //Mantains a estimate of the current robot state.
 //

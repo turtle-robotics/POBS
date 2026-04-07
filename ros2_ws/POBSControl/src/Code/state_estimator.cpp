@@ -75,6 +75,15 @@ void StateEstimator::testFromFile(std::string filename){
             ss >> d;
             kalman->measurementDepth(d);
             writeState("DEPTH");
+        } else if (line.find("GPS_VEL:") == 0) {
+            // Parse: GPS_VEL: [ vx,  vy]  (vz assumed 0 — surfaced)
+            double vx = 0, vy = 0;
+            std::istringstream ss(line.substr(line.find('[') + 1));
+            char comma;
+            ss >> vx >> comma >> vy;
+            Vector3<double> gps_vel{vx, vy, 0.0};
+            kalman->measurementGPSVelocity(gps_vel);
+            writeState("GPS_VEL");
         } else if (line.find("GPS:") == 0) {
             // Parse: GPS:   [  x,   y]
             double x = 0, y = 0;
