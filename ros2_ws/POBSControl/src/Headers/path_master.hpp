@@ -17,6 +17,7 @@ struct PathParams {
     double arrival_threshold;   // metres — how close counts as "reached"
     double max_turn_radius;     // metres — maximum turning radius for path smoothing
     int    intermediate_points; // number of interpolated waypoints between mission points
+    double surface_error_threshold; // max state error before surfacing.
 };
 
 // Reads a mission file (JSON array of waypoints) and drives the sub toward each
@@ -41,7 +42,9 @@ private:
     State goal_state;
 
     // Distance to current goal, updated on every state message
-    double error_mag;
+    double state_error_mag;
+
+
 
     // Loaded waypoints and which one is active
     std::vector<State> waypoints_;
@@ -53,6 +56,8 @@ private:
     // Most-recent position estimate from the state estimator
     Position cur_position_;
 
+    bool is_surfacing;
+
     // ROS2 interfaces
     rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr    goal_pub_;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr         state_sub_;
@@ -63,6 +68,11 @@ private:
 
     // Euclidean distance between two positions
     static double positionDistance(const Position& a, const Position& b);
+
+    // RMS variance magnitude from an Odometry covariance matrix.
+    // The Odometry pose covariance is a row-major 6x6 matrix [x,y,z,roll,pitch,yaw].
+    // Returns sqrt(trace) — the combined standard deviation across all 6 dimensions.
+    static double odometryVarianceMagnitude(const nav_msgs::msg::Odometry& odom);
 };
 
 #endif

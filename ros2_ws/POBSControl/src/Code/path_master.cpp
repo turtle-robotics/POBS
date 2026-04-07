@@ -38,8 +38,8 @@ MasterPather::MasterPather(std::string file_name)
 
     // Timer: periodically republish the active goal so late-joining nodes
     // receive it without waiting for a state update to trigger a re-publish
-    publish_timer_ = this->create_wall_timer(
-        PUBLISH_PERIOD, [this]() { publishGoalState(); });
+    // publish_timer_ = this->create_wall_timer(
+    //     PUBLISH_PERIOD, [this]() { publishGoalState(); });
 
     if (!loadParams(file_name)) {
         RCLCPP_ERROR(this->get_logger(),
@@ -49,6 +49,8 @@ MasterPather::MasterPather(std::string file_name)
     RCLCPP_INFO(this->get_logger(),
         "MasterPather started — %zu waypoints loaded, goal on %s",
         waypoints_.size(), PATH_GOAL_TOPIC);
+
+    is_surfacing=false;
 }
 
 // ── Parameter / mission loading ────────────────────────────────────────────
@@ -124,11 +126,28 @@ void MasterPather::stateCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
     cur_position_.y = msg->pose.pose.position.y;
     cur_position_.z = msg->pose.pose.position.z;
 
-    error_mag = positionDistance(cur_position_, goal_state.position);
+    double error_mag = positionDistance(cur_position_, goal_state.position);
+
+    if(odometryVarianceMagnitude(msg)>path_params_.surface_error_threshold){
+        is_surfacing=true;
+
+        RCLCPP_INFO(this->get_logger(),
+            "Error threshold reached, surfacing %zu / %zu  "
+            "pos(%.2f, %.2f, %.2f)",
+            waypoint_idx_, waypoints_.size() - 1,
+            goal_state.position.x,
+            goal_state.position.y,
+            goal_state.position.z);
+    }
 
     // Advance to the next waypoint once we're close enough
     if (error_mag < path_params_.arrival_threshold && waypoint_idx_ + 1 < waypoints_.size()) {
-        waypoint_idx_++;
+        if(!is_surfacing){
+            waypoint_idx_++;
+        }
+        else{
+            is_surfacing=false;
+        }
         goal_state = waypoints_[waypoint_idx_];
 
         RCLCPP_INFO(this->get_logger(),
@@ -172,4 +191,13 @@ double MasterPather::positionDistance(const Position& a, const Position& b) {
     double dy = a.y - b.y;
     double dz = a.z - b.z;
     return std::sqrt(dx*dx + dy*dy + dz*dz);
+}
+
+// The pose covariance is a row-major 6x6 matrix indexed as [row*6 + col].
+// Diagonal indices 0,7,14,21,28,35 correspond to variances of x,y,z,roll,pitch,yaw.
+// Returns sqrt(sum of diagonal) — RMS spread across all 6 pose dimensions.
+double MasterPather::odometryVarianceMagnitude(const nav_msgs::msg::Odometry& odom) {
+    const auto& cov = odom.pose.covariance;
+    double trace = cov[0] + cov[7] + cov[14] + cov[21] + cov[28] + cov[35];
+    return std::sqrt(trace);
 }
