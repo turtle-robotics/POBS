@@ -63,7 +63,6 @@ bool MasterPather::loadMission(std::string file_name){
         return false;
     }
 
-    json data = json::parse(f, nullptr, /*exceptions=*/false);
     if (data.is_discarded()) {
         RCLCPP_ERROR(this->get_logger(),
             "MasterPather::loadParams: JSON parse error in '%s'", file_name.c_str());
@@ -82,10 +81,6 @@ bool MasterPather::loadMission(std::string file_name){
         s.position.x    = wp["position"]["x"];
         s.position.y    = wp["position"]["y"];
         s.position.z    = wp["position"]["z"];
-        s.orientation.l = wp["orientation"]["l"];
-        s.orientation.i = wp["orientation"]["i"];
-        s.orientation.j = wp["orientation"]["j"];
-        s.orientation.k = wp["orientation"]["k"];
         waypoints_.push_back(s);
     }
 

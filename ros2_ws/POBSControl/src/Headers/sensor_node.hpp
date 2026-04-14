@@ -4,14 +4,19 @@
 #include "common_types.hpp"
 #include <string>
 
+#include <rclcpp/rclcpp.hpp>
+#include <nav_msgs/msg/odometry.hpp>
+
+static constexpr char SENSOR_STATE_TOPIC[] = "/pobs/state";
+
 //Use this to store the needed params for the code
 struct SensorParams {
 };
 
-//This node reads the data from the sensors and publishes that to the ros network
-class SensorNode {
+//This node subscribes to /pobs/state and stores the latest state estimate
+class SensorNode : public rclcpp::Node {
 public:
-    //Starts up the ros node and begins publishing
+    //Starts up the ros node and subscribes to the state topic
     SensorNode(std::string file_name);
 
     //Helper function to allow manual reading from a json
@@ -21,19 +26,19 @@ public:
     //Saves sonar to a file to a file
     void writeSonar();
 
-    //Takes in the reading from the depth sensore I2C
-    double readPressure();
-    //Takes in the reading from the IMU
-    Orientation readIMU();
+    //Called when a new state message arrives — converts and stores it
+    void stateCallback(const nav_msgs::msg::Odometry::SharedPtr msg);
 
-    //This what runs when a state is recived stores the state
-    void stateCallback(const State& incoming_state);
-    
+    //Returns the most recently stored state
+    const State& getState() const { return state; }
+
 private:
     SensorParams params;
     State state;
     IMUData last_imu;
     double last_pressure;
+
+    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr state_sub_;
 };
 
 

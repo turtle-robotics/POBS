@@ -13,20 +13,20 @@
 // Body frame convention:
 //   +X  forward  (surge)
 //   +Y  right    (sway)
-//   +Z  down     (heave — matches positive depth in State::position.z)
+//   +Z  up     (heave)
 //   Positive roll  = right side down
 //   Positive pitch = nose down
 //   Positive yaw   = clockwise from above
 //
-//   Motor 0 — Front-Left,  vertical,   thrusts −Z (upward lift)
-//   Motor 1 — Front-Right, vertical,   thrusts −Z (upward lift)
-//   Motor 2 — Mid-Left,    vertical,   thrusts −Z (upward lift)
-//   Motor 3 — Mid-Right,   vertical,   thrusts −Z (upward lift)
+//   Motor 0 — Front-Left,  vertical,   thrusts −Z (downward lift)
+//   Motor 1 — Front-Right, vertical,   thrusts −Z (downward lift)
+//   Motor 2 — Mid-Left,    vertical,   thrusts −Z (downward lift)
+//   Motor 3 — Mid-Right,   vertical,   thrusts −Z (downward lift)
 //   Motor 4 — Back-Left,   horizontal, thrusts +X (forward thrust)
 //   Motor 5 — Back-Right,  horizontal, thrusts +X (forward thrust)
 //
-// Heave coefficient is −1 for vertical motors because they thrust upward (−Z);
-//   a positive heave command (go deeper) reduces their lift.
+// Heave coefficient is −1 for vertical motors because they thrust downward (-Z);
+//   a positive heave command (rise) reduces their lift.
 //
 // Pitch authority comes from the fore/aft lever arm of motors 0 & 1 only;
 //   mid motors (2 & 3) sit near the CG and contribute negligible pitch torque.
